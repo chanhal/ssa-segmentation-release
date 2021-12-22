@@ -23,7 +23,9 @@ class TqdmHandler(logging.StreamHandler):
 def config_logging(logfile=None):
     path = os.path.join(os.path.dirname(__file__), 'logging.yml')
     with open(path, 'r') as f:
-        config = yaml.load(f.read())
+        # config = yaml.load(f.read(), Loader=yaml.FullLoader)
+        # config = yaml.load(f.read(), yaml.CLoader)
+        config=yaml.safe_load(f.read())
     if logfile is None:
         del config['handlers']['file_handler']
         del config['root']['handlers'][-1]

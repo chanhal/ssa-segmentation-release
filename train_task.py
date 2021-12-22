@@ -36,7 +36,7 @@ class RandomSubset:
 @click.command()
 @click.argument('output')
 @click.option('--model', '-m', default='drn')
-@click.option('--source', '-s', default='gta5')
+@click.option('--source', '-s', default='potsdam')
 @click.option('--lr', '-l', default=0.0016)
 @click.option('--batch-size-per-gpu', '-b', default=8)
 def main(output, model, source, lr, batch_size_per_gpu):
@@ -46,24 +46,25 @@ def main(output, model, source, lr, batch_size_per_gpu):
     iterations = 16000
     step = 16000
 
-
     # datasets
     if '+' in source:
         sources = source.split('+')
         datasets = [get_dataset(source, split='all') for source in sources]
         source_dataset = ConcatDataset(datasets)
         source_dataset.num_classes = 19
+
         val_datasets = [get_dataset(source, split='val') for source in sources]
         source_val_dataset = ConcatDataset(val_datasets)
         source_val_dataset.num_classes = 19
     else:
-        source_dataset = get_dataset(source, split='all')
+        source_dataset = get_dataset(source, split='train')
         source_val_dataset = get_dataset(source, split='val')
 
-    source_dataset = RandomRescaleWrapper(source_dataset, min_scale=0.5, max_scale=2.0, w=2048, h=1024)
-    target_dataset = RandomRescaleWrapper(get_dataset('cityscapes'), min_scale=0.5, max_scale=2.0)
+    # source_dataset = RandomRescaleWrapper(source_dataset, min_scale=0.5, max_scale=2.0, w=2048, h=1024)
+    source_dataset = RandomRescaleWrapper(source_dataset, min_scale=0.5, max_scale=2.0)
+    target_dataset = RandomRescaleWrapper(get_dataset('vaihingen'), min_scale=0.5, max_scale=2.0)
     source_val_dataset = RandomSubset(source_val_dataset)
-    target_val_dataset = get_dataset('cityscapes', split='val')
+    target_val_dataset = get_dataset('vaihingen', split='val')
 
     # net
     num_classes = source_dataset.num_classes
